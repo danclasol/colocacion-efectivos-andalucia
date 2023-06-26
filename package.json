@@ -1,0 +1,47 @@
+{
+	"name": "template-electron-react",
+	"productName": "template-electron-react",
+	"version": "1.0.0",
+	"description": "Template Electron with React application",
+	"main": ".vite/build/main.js",
+	"scripts": {
+		"start": "electron-forge start",
+		"package": "electron-forge package",
+		"make": "electron-forge make",
+		"publish": "electron-forge publish",
+		"lint": "eslint --fix src/**/*.js",
+		"format": "prettier --write ."
+	},
+	"keywords": [],
+	"author": {
+		"name": "Daniel",
+		"email": "danielclark.projects@gmail.com"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@electron-forge/cli": "6.2.1",
+		"@electron-forge/maker-deb": "6.2.1",
+		"@electron-forge/maker-rpm": "6.2.1",
+		"@electron-forge/maker-squirrel": "6.2.1",
+		"@electron-forge/maker-zip": "6.2.1",
+		"@electron-forge/plugin-auto-unpack-natives": "6.2.1",
+		"@electron-forge/plugin-vite": "6.2.1",
+		"@types/react": "18.2.13",
+		"@types/react-dom": "18.2.6",
+		"@vitejs/plugin-react": "4.0.1",
+		"electron": "25.2.0",
+		"eslint": "8.43.0",
+		"eslint-config-prettier": "8.8.0",
+		"eslint-config-standard": "17.1.0",
+		"eslint-plugin-import": "2.27.5",
+		"eslint-plugin-n": "16.0.0",
+		"eslint-plugin-promise": "6.1.1",
+		"eslint-plugin-react": "7.32.2",
+		"prettier": "2.8.8"
+	},
+	"dependencies": {
+		"electron-squirrel-startup": "1.0.0",
+		"react": "18.2.0",
+		"react-dom": "18.2.0"
+	}
+}

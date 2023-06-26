@@ -1,0 +1,16 @@
+@import "./normalize.css";
+@import "./fonts.css";
+@import "./theme.css";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}

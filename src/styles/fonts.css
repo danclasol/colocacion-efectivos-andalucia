@@ -1,0 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;1,200;1,400&display=swap');
+
+:root {
+	--title-app: 4.5rem;
+	--title-1: 3rem;
+	--title-2: 2rem;
+	--title-3: 1.5rem;
+	--text: 1rem;
+	--text-sm: 0.875rem;
+}
+
+body {
+	font-family: 'Poppins', sans-serif;
+}
