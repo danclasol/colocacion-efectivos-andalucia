@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
+import { app, BrowserWindow, ipcMain } from 'electron';
+import path from 'path';
+import { extractDataFromFile } from './lib/importaDataFromTxt';
 
 const MAIN_WINDOW_VITE_DEV_SERVER_URL = '';
 const MAIN_WINDOW_VITE_NAME = '';
@@ -12,9 +13,12 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
 	// Create the browser window.
 	const mainWindow = new BrowserWindow({
-		width: 800,
-		height: 600,
+		width: 1200,
+		height: 800,
+		minWidth: 400,
 		webPreferences: {
+			contextIsolation: true,
+			nodeIntegration: false,
 			preload: path.join(__dirname, 'preload.js'),
 		},
 	});
@@ -35,7 +39,14 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+	ipcMain.handle('saveText', handleSaveFile);
+	createWindow();
+});
+
+const handleSaveFile = (event, province, rawData) => {
+	return extractDataFromFile(province, rawData);
+};
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

@@ -1,0 +1,28 @@
+export const CENTER_TYPES = [
+	{ type: 'C.E.I.P.', name: 'Colegio de Educación Infantil y Primaria' },
+	{ type: 'I.E.S.', name: 'Instituto de Educación Secundaria' },
+	{ type: 'S.E.P.', name: 'Secretaría de Educación Pública' },
+	{ type: 'C.E.E.E.', name: 'Centros Especificos de Educación Especial' },
+	{ type: 'C.E.PER.', name: 'Centro de Educación Permanente' },
+	{ type: 'C.E.PR.', name: 'Centro de Educación Primaria' },
+	{ type: 'C.P.M.', name: '' },
+	{ type: 'C.P.R.', name: '' },
+	{ type: 'C.E.M.', name: '' },
+	{ type: 'C.P.D.', name: '' },
+	{ type: 'I.P.E.P.', name: 'Instituto Provincial de Educación Permanente' },
+	{ type: 'C.C.', name: '' },
+	{ type: 'E.A.', name: '' },
+	{ type: 'E.E.', name: '' },
+	{ type: 'E.I.', name: '' },
+	{ type: 'E.O.E.', name: 'Equipos de Orientación Educativa' },
+	{ type: 'E.O.I.', name: 'Escuelas Oficiales de Idiomas' },
+	{
+		type: 'S.I.P.E.P.',
+		name: 'Sección del Instituto Provincial de Educación Permanente',
+	},
+	{
+		type: 'C.P.I.F.P.',
+		name: 'Centro Público Integrado de Formación Profesional',
+	},
+	{ type: 'Otro', name: 'Otro' },
+];
