@@ -12,10 +12,10 @@ export const extractDataFromFile = async (province, rawData) => {
 		const data = removeDuplicates(mappedData);
 
 		// Centers File
-		writeCentersFile(data, province);
+		await writeCentersFile(data, province);
 
 		// Locations File
-		writeLocationsFile(data, province);
+		await writeLocationsFile(data, province);
 
 		return { success: true, error: false, isAborted: false };
 	} catch (err) {

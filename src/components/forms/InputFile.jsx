@@ -1,40 +1,32 @@
-import { useState } from 'react';
 import ImportIcon from '../icons/ImportIcon';
+import LoadingSpinner from '../shared/LoadingSpinner';
 
-const InputFile = ({ province, ...props }) => {
-	const [loading, setLoading] = useState(false);
-
+const InputFileText = ({
+	isLoading,
+	disabled,
+	handleImportFile,
+	children,
+	...props
+}) => {
 	const handleFileInput = ev => {
-		if (loading) return;
-
-		setLoading(true);
-
 		const file = ev.target.files[0];
-		const reader = new FileReader();
 
-		reader.addEventListener(
-			'load',
-			async () => {
-				const data = reader.result;
-				await window.bridge.saveText(province, data);
+		handleImportFile(file);
 
-				setLoading(false);
-			},
-			false
-		);
-
-		if (file) {
-			reader.readAsText(file);
-		}
+		ev.target.value = '';
 	};
 
-	const classIcon = !loading
-		? 'text-gray-500 hover:rounded-full hover:text-white hover:bg-slate-400 hover:overflow-visible'
-		: 'text-white rounded-full bg-slate-300 overflow-visible cursor-progress';
+	const inputStyle =
+		!isLoading && !disabled ? 'bg-blue-700 hover:bg-blue-800' : 'bg-gray-400';
 
 	return (
-		<label>
-			<ImportIcon className={`w-12 h-12 p-3 ${classIcon}`} />
+		<label
+			className={`flex gap-3 items-center w-full text-white font-medium text-sm rounded-lg px-5 py-2.5 focus:ring-blue-300 ${inputStyle}`}>
+			{!isLoading ? (
+				<ImportIcon className={`w-5 h-5`} />
+			) : (
+				<LoadingSpinner className={`w-5 h-5`} />
+			)}
 			<input
 				type="file"
 				{...props}
@@ -42,8 +34,11 @@ const InputFile = ({ province, ...props }) => {
 				onChange={handleFileInput}
 				accept=".txt"
 			/>
+			<span className="text-lg text-center border-blue-500 border-opacity-100">
+				{!isLoading ? children : 'Cargando'}
+			</span>
 		</label>
 	);
 };
 
-export default InputFile;
+export default InputFileText;

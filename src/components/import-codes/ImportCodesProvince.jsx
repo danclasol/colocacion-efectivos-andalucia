@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getCenters } from '../../lib/centers';
 import { getLocations } from '../../lib/locations';
-import InputFile from '../forms/InputFile';
 import CheckIcon from '../icons/CheckIcon';
 import CrossIcon from '../icons/CrossIcon';
 
@@ -42,9 +41,6 @@ const ImportCodesProvince = ({ province, name }) => {
 						<span>{`Localidades: ${numberLocations}`}</span>
 					</div>
 				</div>
-			</div>
-			<div>
-				<InputFile province={province} />
 			</div>
 		</div>
 	);
