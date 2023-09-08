@@ -2,7 +2,10 @@ import { writeFile } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { CENTER_TYPES } from '../constants/center-types';
+import { PROVINCES } from '../constants/provinces';
+import { ProvinceNotMatch } from '../errors/ProvinceNotMatch';
 import { getCenterAddressDetails, getCityAddressDetails } from './geocoding';
+import { getProvinceName } from './province';
 
 export const extractDataFromFile = async (province, rawData) => {
 	try {
@@ -19,7 +22,17 @@ export const extractDataFromFile = async (province, rawData) => {
 
 		return { success: true, error: false, isAborted: false };
 	} catch (err) {
+		const errorProvince = err.name === 'ProvinceNotMatch';
+
+		if (errorProvince)
+			return {
+				success: false,
+				error: { code: 200, message: err.message },
+				aborted: false,
+			};
+
 		const isAborted = err.name === 'AbortError';
+
 		const error = isAborted
 			? undefined
 			: { code: 500, message: 'Error server' };
@@ -48,6 +61,17 @@ const writeCentersFile = async (data, province) => {
 			const details = await getCenterAddressDetails(
 				`${center.name} ${center.location.name} ${province}`
 			);
+
+			const check = PROVINCES.find(
+				item => item.name === details?.addressDetails?.province
+			);
+
+			if (province !== check.province)
+				throw new ProvinceNotMatch(
+					`El fichero contiene registros no pertenecen a ${getProvinceName(
+						province
+					)}`
+				);
 
 			return {
 				...center,
