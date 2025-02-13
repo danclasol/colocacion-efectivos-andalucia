@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { getCenters } from '../../lib/centers';
 import { getLocations } from '../../lib/locations';
+import IconButton from '../buttons/IconButton';
 import CheckIcon from '../icons/CheckIcon';
 import CrossIcon from '../icons/CrossIcon';
+import DotsIcon from '../icons/DotsIcon';
 
-const ImportCodesProvince = ({ province, name }) => {
+const ImportCodesListProvince = ({ province, name }) => {
+	const navigate = useNavigate();
+
 	const [centers, setCenters] = useState();
 	const [locations, setLocations] = useState();
 
@@ -14,8 +19,8 @@ const ImportCodesProvince = ({ province, name }) => {
 	const correctImport = numberCenters > 0 && numberLocations > 0;
 
 	useEffect(() => {
-		loadCenters({ location: province, setCenters });
-		loadLocations({ location: province, setLocations });
+		loadCenters({ province, setCenters });
+		loadLocations({ province, setLocations });
 	}, []);
 
 	const getIcon = count => {
@@ -24,7 +29,9 @@ const ImportCodesProvince = ({ province, name }) => {
 	};
 
 	return (
-		<div className="flex justify-between items-center gap-4 px-10 py-6 rounded-lg text-gray-700 bg-gray-50 border-2 border-gray-100">
+		<Link
+			className="flex justify-between items-center gap-4 px-10 py-6 rounded-lg text-gray-700 bg-gray-50 border-2 border-gray-100 hover:bg-gray-100 hover:border-gray-200"
+			to={`/importar-codigos/${province}`}>
 			<div className="flex flex-col gap-2 w-full">
 				<div className="flex items-center gap-3">
 					{correctImport && <CheckIcon className="w-6 h-6 text-green-400" />}
@@ -42,13 +49,21 @@ const ImportCodesProvince = ({ province, name }) => {
 					</div>
 				</div>
 			</div>
-		</div>
+			<div className="-m-6">
+				<IconButton
+					icon={DotsIcon}
+					onClick={() => {
+						navigate(`/importar-codigos/${province}`);
+					}}
+				/>
+			</div>
+		</Link>
 	);
 };
 
-const loadCenters = async ({ location, setCenters }) => {
+const loadCenters = async ({ province, setCenters }) => {
 	const { centers } = await getCenters({
-		location,
+		province,
 	});
 
 	if (centers) {
@@ -56,9 +71,9 @@ const loadCenters = async ({ location, setCenters }) => {
 	}
 };
 
-const loadLocations = async ({ location, setLocations }) => {
+const loadLocations = async ({ province, setLocations }) => {
 	const { locations } = await getLocations({
-		location,
+		province,
 	});
 
 	if (locations) {
@@ -66,4 +81,4 @@ const loadLocations = async ({ location, setLocations }) => {
 	}
 };
 
-export default ImportCodesProvince;
+export default ImportCodesListProvince;

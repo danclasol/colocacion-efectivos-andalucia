@@ -28,7 +28,7 @@ const Modal = ({ className, onClose, children }) => {
 				}}`}
 				ref={modalRef}>
 				<div className="absolute top-1 right-1">
-					<IconButton icon={CloseIcon} onClick={onClose} />
+					<IconButton icon={CloseIcon} onClick={onClose} color="gray" filled />
 				</div>
 				{children}
 			</div>

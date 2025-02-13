@@ -1,27 +1,57 @@
-import { writeFile } from 'fs';
+import { writeFile, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { CENTER_TYPES } from '../constants/center-types';
-import { PROVINCES } from '../constants/provinces';
 import { ProvinceNotMatch } from '../errors/ProvinceNotMatch';
 import { getCenterAddressDetails, getCityAddressDetails } from './geocoding';
 import { getProvinceName } from './province';
 
+const transformData = (rawData, province) => {
+	const arrayFile = removeHeaders(rawData).split('\n');
+	const formattedData = formatData(arrayFile, province);
+	const mappedData = mapData(formattedData, province);
+	const centers = removeDuplicates(mappedData);
+	const locations = extractLocations(centers);
+
+	return { centers, locations };
+};
+
 export const extractDataFromFile = async (province, rawData) => {
 	try {
-		const arrayFile = removeHeaders(rawData).split('\n');
-		const formattedData = formatData(arrayFile, province);
-		const mappedData = mapData(formattedData, province);
-		const data = removeDuplicates(mappedData);
+		// Transform data
+		const { centers, locations } = transformData(rawData, province);
 
 		// Centers File
-		await writeCentersFile(data, province);
+		const errorCenters = await writeCentersFile(centers, province);
+
+		if (errorCenters)
+			return {
+				result: { centers: [], locations: [] },
+				success: false,
+				error: true,
+				isAborted: false,
+			};
 
 		// Locations File
-		await writeLocationsFile(data, province);
+		// const errorLocations = await writeLocationsFile(locations, province);
 
-		return { success: true, error: false, isAborted: false };
+		// if (errorLocations)
+		// 	return {
+		// 		result: { centers, locations: [] },
+		// 		success: false,
+		// 		error: true,
+		// 		isAborted: false,
+		// 	};
+
+		return {
+			result: { centers, locations },
+			success: true,
+			error: false,
+			isAborted: false,
+		};
 	} catch (err) {
+		console.log(err);
+
 		const errorProvince = err.name === 'ProvinceNotMatch';
 
 		if (errorProvince)
@@ -46,6 +76,7 @@ export const extractDataFromFile = async (province, rawData) => {
 };
 
 const writeCentersFile = async (data, province) => {
+	let error;
 	const dirnameSrc = dirname(fileURLToPath(import.meta.url));
 
 	const pathCenters = join(
@@ -56,41 +87,20 @@ const writeCentersFile = async (data, province) => {
 	);
 
 	// Get Locations
-	const centersWithAddress = await Promise.all(
-		data.map(async center => {
-			const details = await getCenterAddressDetails(
-				`${center.name} ${center.location.name} ${province}`
-			);
+	// const centersWithAddress = addCoordsToCenters();
 
-			const check = PROVINCES.find(
-				item => item.name === details?.addressDetails?.province
-			);
-
-			if (province !== check.province)
-				throw new ProvinceNotMatch(
-					`El fichero contiene registros no pertenecen a ${getProvinceName(
-						province
-					)}`
-				);
-
-			return {
-				...center,
-				location: { ...center.location, ...details.addressDetails },
-			};
-		})
-	);
-
-	writeFile(pathCenters, JSON.stringify(centersWithAddress), err => {
+	writeFileSync(pathCenters, JSON.stringify(data), err => {
 		if (err) {
 			console.error(err);
+			error = err;
+
+			return error;
 		}
 	});
 };
 
-const writeLocationsFile = async (data, province) => {
-	const dirnameSrc = dirname(fileURLToPath(import.meta.url));
-
-	const listLocalidades = data.map(item => {
+const extractLocations = cemters => {
+	const listLocalidades = cemters.map(item => {
 		return { ...item.location };
 	});
 
@@ -102,19 +112,14 @@ const writeLocationsFile = async (data, province) => {
 		return total;
 	}, []);
 
-	// Get Locations
-	const localidadesWithAddress = await Promise.all(
-		localidades.map(async item => {
-			const details = await getCityAddressDetails(
-				`${item.name} ${item.province}`
-			);
+	return localidades;
+};
 
-			return {
-				...item,
-				...details.addressDetails,
-			};
-		})
-	);
+const writeLocationsFile = async (data, province) => {
+	const dirnameSrc = dirname(fileURLToPath(import.meta.url));
+
+	// Get Locations
+	// const localidadesWithAddress = addCoordsToLocations(localidades);
 
 	const pathLocations = join(
 		dirnameSrc,
@@ -123,7 +128,7 @@ const writeLocationsFile = async (data, province) => {
 		`/files/output/${province}_localidades.json`
 	);
 
-	writeFile(pathLocations, JSON.stringify(localidadesWithAddress), err => {
+	writeFile(pathLocations, JSON.stringify(data), err => {
 		if (err) {
 			console.error(err);
 		}
@@ -199,4 +204,58 @@ const removeDuplicates = data => {
 	}, []);
 
 	return result;
+};
+
+const addCoordsToCenters = async (data, province) => {
+	return await Promise.all(
+		data.map(async item => {
+			const { addressDetails } = await getCenterAddressDetails(
+				`${item.center} ${item.name} ${item.location.name} ${province}`
+			);
+
+			if (!addressDetails?.province && !addressDetails?.street) {
+				console.log('No se ha encontrado nada', {
+					center: item,
+					province,
+					search: `${item.center} ${item.name} ${item.location.name} ${province}`,
+				});
+			} else {
+				const check = getProvinceName(province) === addressDetails?.province;
+
+				if (!check) {
+					console.log(
+						`El fichero contiene registros no pertenecen a ${getProvinceName(
+							province
+						)} (${item.code} ${addressDetails?.formattedAddress})`
+					);
+
+					throw new ProvinceNotMatch(
+						`El fichero contiene registros no pertenecen a ${getProvinceName(
+							province
+						)} (${addressDetails?.formattedAddress})`
+					);
+				}
+			}
+
+			return {
+				...item,
+				location: { ...item.location, ...addressDetails },
+			};
+		})
+	);
+};
+
+const addCoordsToLocations = async data => {
+	await Promise.all(
+		data.map(async item => {
+			const details = await getCityAddressDetails(
+				`${item.name} ${item?.province}`
+			);
+
+			return {
+				...item,
+				...details.addressDetails,
+			};
+		})
+	);
 };

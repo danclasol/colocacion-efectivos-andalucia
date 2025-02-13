@@ -1,10 +1,10 @@
 import { PROVINCES } from '../constants/provinces';
 
-export const getCenters = async ({ location }) => {
-	let centers;
+export const getCenters = async ({ province }) => {
+	let centers = [];
 
 	try {
-		const res = await fetch(`/files/output/${location}.json`);
+		const res = await fetch(`/files/output/${province}.json`);
 
 		if (res.ok) {
 			centers = await res.json();

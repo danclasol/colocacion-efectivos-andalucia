@@ -1,8 +1,8 @@
-export const getLocations = async ({ location }) => {
+export const getLocations = async ({ province }) => {
 	let locations;
 
 	try {
-		const res = await fetch(`/files/output/${location}_localidades.json`);
+		const res = await fetch(`/files/output/${province}_localidades.json`);
 
 		if (res.ok) {
 			locations = await res.json();
